@@ -1095,6 +1095,9 @@ function renderHaccp(filter) {
 function filterHaccp(cat, btn) {
   document.querySelectorAll('#view-haccp .filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  // Nascondi pulsante "mostra tutte" se presente
+  const showBtn = document.getElementById('haccp-show-all-btn');
+  if (showBtn) showBtn.style.display = 'none';
   renderHaccp(cat);
 }
 
@@ -1536,20 +1539,45 @@ function goToHaccp(id) {
   // Switch to HACCP tab
   const haccpTab = document.querySelectorAll('.view-tab')[2];
   switchView('haccp', haccpTab);
-  // Render if needed
-  if (document.getElementById('haccp-grid').children.length === 0) renderHaccp('all');
-  // Scroll to the matching scheda
+  // Render solo la ricetta richiesta
+  renderHaccp('all');
   setTimeout(() => {
     const r = data.find(x => x.id === id);
     if (!r) return;
+    // Nascondi tutte le schede tranne quella richiesta
     const all = document.querySelectorAll('#haccp-grid .scheda');
     let target = null;
-    all.forEach(s => { if (s.querySelector('.scheda-title') && s.querySelector('.scheda-title').textContent === r.title) target = s; });
+    all.forEach(s => {
+      const titleEl = s.querySelector('.scheda-title');
+      if (titleEl && titleEl.textContent === r.title) {
+        target = s;
+        s.style.display = 'block';
+      } else {
+        s.style.display = 'none';
+      }
+    });
+    // Aggiungi pulsante "Mostra tutte le ricette" se non esiste già
+    const grid = document.getElementById('haccp-grid');
+    let btn = document.getElementById('haccp-show-all-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'haccp-show-all-btn';
+      btn.style.cssText = 'display:block;margin:1rem auto 2rem;padding:.55rem 1.5rem;background:var(--navy);color:#fff;border:none;border-radius:3px;font-family:"Crimson Pro",serif;font-size:.88rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;';
+      btn.textContent = '← Mostra tutte le ricette';
+      btn.onclick = () => {
+        all.forEach(s => s.style.display = 'block');
+        btn.style.display = 'none';
+        window.scrollTo({top: document.getElementById('view-haccp').offsetTop - 80, behavior:'smooth'});
+      };
+      grid.insertBefore(btn, grid.firstChild);
+    } else {
+      btn.style.display = 'block';
+    }
+    // Scorri alla scheda
     if (target) {
       target.scrollIntoView({behavior:'smooth', block:'start'});
-      target.style.outline = '3px solid var(--terracotta)';
-      setTimeout(() => target.style.outline = '', 2000);
     }
+    window.scrollTo({top: 0, behavior:'smooth'});
   }, 150);
 }
 
