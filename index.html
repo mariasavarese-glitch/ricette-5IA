@@ -775,6 +775,8 @@ function openModal(id) {
           <div class="scheda-cell-label"><span>🌿</span> Stagionalità</div>
           <p style="font-size:.88rem;font-style:italic;opacity:.7;margin-top:.2rem">${r.stagione}</p>
         </div>
+        ${buildModalAdattamentiHtml(ex.adattamenti)}
+        ${buildSdgHtml(id)}
       </div>
       <div class="macros-row" style="border-top:1px solid var(--sky2)">
         <div class="macro"><div class="macro-val">${r.macros.kcal}</div><span class="macro-label">kcal</span></div>
@@ -1230,6 +1232,21 @@ const sdgData = [
   /* 15 — Insalatina seppia Valestra */
   [{n:3,titolo:"Salute e benessere",desc:"Il piatto combina proteine magre della seppia (72 kcal/100 g), Omega-3 ALA delle noci, vitamina C degli agrumi a vivo e polifenoli eccezionali dell'olio EVO DOP Terra di Bari. È naturalmente senza glutine e senza lattosio: adatto a celiachia, intolleranza al lattosio e regimi dimagranti."},{n:14,titolo:"Vita sott'acqua",desc:"La seppia è un cefalopode con ciclo vitale breve che si riproduce rapidamente: pesca sostenibile se effettuata con metodi selettivi (nasse, lenze). Rispetto ad altri frutti di mare, la seppia ha una bassa impronta ambientale. Valorizzare la seppia locale riduce la pressione sulle specie più pregiate."},{n:12,titolo:"Consumo responsabile",desc:"Il piatto non richiede cottura lunga: risparmio energetico significativo. Tutti gli ingredienti sono locali campani o pugliesi. L'olio EVO DOP Terra di Bari è ottenuto con frangitura entro 24h dalla raccolta: filiera cortissima, zero sprechi, massima qualità. Gli scarti delle seppie (tentacoli) sono utilizzabili in altre preparazioni."},{n:15,titolo:"Vita sulla terra",desc:"La cultivar Coratina, base dell'olio EVO DOP Terra di Bari, è una varietà autoctona pugliese con secoli di storia. La sua coltivazione con sesti di impianto tradizionali in oliveti storici (alcuni pluricentenari) preserva la biodiversità agraria pugliese e il paesaggio rurale della Murgia barese, di straordinario valore culturale."}]
 ];
+function buildModalAdattamentiHtml(adapt) {
+  if (!adapt || !Object.keys(adapt).length) return '';
+  const labels = {vegan:'🌱 Vegan',lattosio:'🥛 Lattosio',celiaci:'🌾 Celiaci',halal:'☪ Halal',kosher:'✡ Kosher'};
+  const cards = Object.entries(adapt).map(([k,v]) =>
+    '<div class="adapt-card adapt-'+k+'">' +
+    '<span class="adapt-label">'+(labels[k]||k)+'</span>' +
+    '<p class="adapt-text">'+v+'</p>' +
+    '</div>'
+  ).join('');
+  return '<div style="background:#F8F9FA;border-radius:3px;padding:.8rem 1rem;margin-top:.2rem">' +
+    '<div class="scheda-cell-label" style="margin-bottom:.5rem"><span>🍽</span> Adattamenti per esigenze dietetiche e religiose</div>' +
+    '<div class="adapt-grid">'+cards+'</div>' +
+    '</div>';
+}
+
 function buildSdgHtml(recipeId) {
   const sdgs = sdgData[recipeId] || [];
   if (!sdgs.length) return '';
